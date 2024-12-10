@@ -1,27 +1,16 @@
-name: Makefile CI
+TARGET = iphone:clang:latest:11.0
+ARCHS = arm64
+INSTALL_TARGET_PROCESSES = YouTube
+PACKAGE_VERSION = 1.8.19
+MIN_YOUTUBE_VERSION = 16.29.4
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+EXTRA_CFLAGS = -DMIN_YOUTUBE_VERSION=$(MIN_YOUTUBE_VERSION)
 
-jobs:
-  build:
+include $(THEOS)/makefiles/common.mk
 
-    runs-on: ubuntu-latest
+TWEAK_NAME = YouPiP
+$(TWEAK_NAME)_FILES = Tweak.x Settings.x LegacyPiPCompat.x
+$(TWEAK_NAME)_CFLAGS = -fobjc-arc $(EXTRA_CFLAGS)
+$(TWEAK_NAME)_FRAMEWORKS = AVFoundation AVKit UIKit
 
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: configure
-      run: ./configure
-
-    - name: Install dependencies
-      run: make
-
-    - name: Run check
-      run: make check
-
-    - name: Run distcheck
-      run: make distcheck
+include $(THEOS_MAKE_PATH)/tweak.mk
